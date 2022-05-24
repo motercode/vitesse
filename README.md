@@ -1,8 +1,11 @@
+pasos para crear un proyecto
+Created by Fernando Gost
+Last updated: less than a minute ago4 min read
 primer creamos la aplicacion de vitesse que es un template de vit.
 
-https://vitejs.dev/guide/#community-templates) 
+Getting Started | Vite 
 npx degit antfu/vitesse vitesseapp
-https://github.com/antfu/vitesse)
+https://github.com/antfu/vitesse) - Connect to preview
 
 borrar el .github
 
@@ -21,12 +24,12 @@ ERR_PNPM_PEER_DEP_ISSUES  Unmet peer dependencies
 └── ✕ unmet peer vue-i18n@next: found 9.1.10
 esta ya metido como deuda técnica , no afecta en el proyecto por ahora.
 
-
+ 
 
 configuración del proyecto 
 
 seguimos los pasos de :
-https://github.com/antfu/vitesse#checklist 
+GitHub - antfu/vitesse: 🏕 Opinionated Vite Starter Template 
 en este paso 
 
 “Change the hostname in vite.config.ts”
@@ -39,7 +42,8 @@ no se a lo que se refiere con esto , porque se crean según los módulos que vas
 
 se puede seguir con el proyecto .
 
-fix pinia SSG problem https://github.com/vuejs/pinia/issues/665#issuecomment-917304172 
+fix pinia SSG problem error when building with vite-ssg · Issue #665 · vuejs/pinia 
+
 
 ....
 import { createPinia } from 'pinia'
@@ -54,8 +58,10 @@ export const createApp = ViteSSG(
     ctx.app.use(pinia)
   },
 )
+debemos añadir esas dos lineas, que aunque en dev nos dan un warning , hacen que viteSSG cree en el build lo necesario para el objeto pinia store y se pueda usar la sintaxis nomal de pinia .
 
-debemos añadir esas dos lineas, que aunque en dev nos dan un warning , hacen que viteSSG cree en el build lo necesario para el objeto pinia store y se pueda usar la sintaxis nomal de pinia 
+Podemos hacer el build sin ssg con el script  build:noSSG  y no seria necesario añadir lo anterior.
+
 
 export const useStore = defineStore('main', {
   state: () => ({
@@ -66,8 +72,7 @@ export const useStore = defineStore('main', {
   actions: {
   }
 }
-
-
+ 
 
 repasando todos los scripts de pnpm
 
@@ -94,21 +99,24 @@ la usaremos para producir el informe del test de cobertura compatible con gitlab
 
 y añadimos esto al final de la configuración de vite.config.ts
 
+
  coverage: {
       reporter: ['text', 'cobertura'],
     },
+ 
 
-para hacer los test automatizados de integración continua y que ademas cree el informe de cobertura 
+añadimos lo siguiente para hacer los build sin SSG de forma que sorteamos los problemas con modulos commonJS 
 
-
+"build:noSSG": "vite build"
 
 Configuramos eslint para ignore patterns cypress segun indica en el index.js comentados
 
-
+ 
 
 Configuracion del Gitlab CI
 
 creamos el archivo en el ./ del proyecto llamado .gitlab-ci.yml
+
 
 stages:    
   - prepare      
@@ -200,18 +208,18 @@ cypress-e2e-chrome:
      paths:
      - cypress/screenshots
      - cypress/videos
-
-
+ 
 
 añadir al archivo .eslintignore
+
 
 dist
 public
 cypress/plugins/index.js  
 cache/*
 cypress/support/index.js
-
 y en .eslintrc
+
 
 {
   "env": {
@@ -230,8 +238,7 @@ y en .eslintrc
     "module": true
   }
 }
-
-
+ 
 
 incorporación de los componentes de chakra
 
@@ -240,6 +247,7 @@ pnpm i @chakra-ui/vue-next
 pnpm i -D @babel/core
 
 create file on modules chakra.ts  
+
 
 import ChakraUIVuePlugin, { chakra } from "@chakra-ui/vue-next";
 import { domElements } from "@chakra-ui/vue-system";
@@ -254,23 +262,23 @@ export const install: UserModule = ({ app, router, isClient }) => {
     app.component(`chakra.${tag}`, chakra(tag));
   });
 }
-
 añadir un script en el package.jon para hacer el build sin SSG 
 
 "build:noSSG": "vite build"
 
-https://vue.chakra-ui.com/getting-started 
+Chakra UI Vue | Documentation 
 
-https://next.vue.chakra-ui.com/ 
+Chakra UI Vue 
 
-
+ 
 
 configurar los mensajes de gitlab
 
 seguir las pautas del link para configurar los mensajes cada usuario 
 
-https://docs.gitlab.com/ee/user/profile/notifications.html 
+Notification emails | GitLab 
 
 https://gitlab.com/-/profile/notifications
 
 usar custom notifications activar las de pipeline
+
