@@ -1,197 +1,276 @@
-<p align='center'>
-  <img src='https://user-images.githubusercontent.com/11247099/154486817-f86b8f20-5463-4122-b6e9-930622e757f2.png' alt='Vitesse - Opinionated Vite Starter Template' width='600'/>
-</p>
+primer creamos la aplicacion de vitesse que es un template de vit.
 
-<p align='center'>
-Mocking up web app with <b>Vitesse</b><sup><em>(speed)</em></sup><br>
-</p>
+https://vitejs.dev/guide/#community-templates) 
+npx degit antfu/vitesse vitesseapp
+https://github.com/antfu/vitesse)
 
-<br>
+borrar el .github
 
-<p align='center'>
-<a href="https://vitesse.netlify.app/">Live Demo</a>
-</p>
+clonar el proyecto creado en gitlab 
 
-<br>
+npm install pnpm
+pnpm install
 
-<p align='center'>
-<b>English</b> | <a href="https://github.com/antfu/vitesse/blob/main/README.zh-CN.md">简体中文</a>
-<!-- Contributors: Thanks for geting interested, however we DON'T accept new transitions to the README, thanks. -->
-</p>
 
-<br>
+si aparece el error 
 
+ERR_PNPM_PEER_DEP_ISSUES  Unmet peer dependencies
 
-## Features
+.
+└─┬ @intlify/vite-plugin-vue-i18n
+└── ✕ unmet peer vue-i18n@next: found 9.1.10
+esta ya metido como deuda técnica , no afecta en el proyecto por ahora.
 
-- ⚡️ [Vue 3](https://github.com/vuejs/vue-next), [Vite 2](https://github.com/vitejs/vite), [pnpm](https://pnpm.js.org/), [ESBuild](https://github.com/evanw/esbuild) - born with fastness
 
-- 🗂 [File based routing](./src/pages)
 
-- 📦 [Components auto importing](./src/components)
+configuración del proyecto 
 
-- 🍍 [State Management via Pinia](https://pinia.esm.dev/)
+seguimos los pasos de :
+https://github.com/antfu/vitesse#checklist 
+en este paso 
 
-- 📑 [Layout system](./src/layouts)
+“Change the hostname in vite.config.ts”
 
-- 📲 [PWA](https://github.com/antfu/vite-plugin-pwa)
+no aparece el hostname lo mas parecido son las claves de server.host o preview.host, lo hemos pasado a deuda técnica pues no parece que afecte al proyecto.
 
-- 🎨 [UnoCSS](https://github.com/antfu/unocss) - the instant on-demand atomic CSS engine
+“… remove routes”
 
-- 😃 [Use icons from any icon sets with classes](https://github.com/antfu/unocss/tree/main/packages/preset-icons)
+no se a lo que se refiere con esto , porque se crean según los módulos que vas poniendo , creo un issue para mirarlo bien.
 
-- 🌍 [I18n ready](./locales)
+se puede seguir con el proyecto .
 
-- 🗒 [Markdown Support](https://github.com/antfu/vite-plugin-md)
+fix pinia SSG problem https://github.com/vuejs/pinia/issues/665#issuecomment-917304172 
 
-- 🔥 Use the [new `<script setup>` syntax](https://github.com/vuejs/rfcs/pull/227)
+....
+import { createPinia } from 'pinia'
+....
+export const createApp = ViteSSG(
+  App,
+  { routes, base: import.meta.env.BASE_URL },
+  (ctx) => {
+    // install all modules under `modules/`
+    Object.values(import.meta.globEager('./modules/*.ts')).forEach(i => i.install?.(ctx))
+    const pinia = createPinia()
+    ctx.app.use(pinia)
+  },
+)
 
-- 🤙🏻 [Reactivity Transform](https://vuejs.org/guide/extras/reactivity-transform.html) enabled
+debemos añadir esas dos lineas, que aunque en dev nos dan un warning , hacen que viteSSG cree en el build lo necesario para el objeto pinia store y se pueda usar la sintaxis nomal de pinia 
 
-- 📥 [APIs auto importing](https://github.com/antfu/unplugin-auto-import) - use Composition API and others directly
+export const useStore = defineStore('main', {
+  state: () => ({
+  }),
+  getters: {
+    
+  },
+  actions: {
+  }
+}
 
-- 🖨 Static-site generation (SSG) via [vite-ssg](https://github.com/antfu/vite-ssg)
 
-- 🦔 Critical CSS via [critters](https://github.com/GoogleChromeLabs/critters)
 
-- 🦾 TypeScript, of course
+repasando todos los scripts de pnpm
 
-- ⚙️ Unit Testing with [Vitest](https://github.com/vitest-dev/vitest), E2E Testing with [Cypress](https://cypress.io/) on [GitHub Actions](https://github.com/features/actions)
+se han creado task y bugs de lo que no se entiende "preview-https": "serve dist", por ejemplo.
+añadimos los scripts : 
 
-- ☁️ Deploy on Netlify, zero-config
+"dev:silent": "vite --port 3333"
 
-<br>
+que sirve para poder poner el servidor en marcha sin que te abra una tab del navegador.
 
+"test:e2e:silent": "cypress run"
 
-## Pre-packed
+lanza los test de cypress sin abrir el inteface , mostrando el resultado en el terminal.
 
-### UI Frameworks
+"test:unit": "vitest --run" 
 
-- [UnoCSS](https://github.com/antfu/unocss) - The instant on-demand atomic CSS engine.
+lo modificamos pues hay dos iguales que llamaban a vitest, en este caso test:unit hace un solo test sin activar el watch
 
-### Icons
+pnpm i c8
 
-- [Iconify](https://iconify.design) - use icons from any icon sets [🔍Icônes](https://icones.netlify.app/)
-- [Pure CSS Icons via UnoCSS](https://github.com/antfu/unocss/tree/main/packages/preset-icons)
+la usaremos para producir el informe del test de cobertura compatible con gitlab. 
 
-### Plugins
+"test:and:coverage": "vitest run --coverage"
 
-- [Vue Router](https://github.com/vuejs/vue-router)
-  - [`vite-plugin-pages`](https://github.com/hannoeru/vite-plugin-pages) - file system based routing
-  - [`vite-plugin-vue-layouts`](https://github.com/JohnCampionJr/vite-plugin-vue-layouts) - layouts for pages
-- [Pinia](https://pinia.esm.dev) - Intuitive, type safe, light and flexible Store for Vue using the composition api
-- [`unplugin-vue-components`](https://github.com/antfu/unplugin-vue-components) - components auto import
-- [`unplugin-auto-import`](https://github.com/antfu/unplugin-auto-import) - Directly use Vue Composition API and others without importing
-- [`vite-plugin-pwa`](https://github.com/antfu/vite-plugin-pwa) - PWA
-- [`vite-plugin-md`](https://github.com/antfu/vite-plugin-md) - Markdown as components / components in Markdown
-  - [`markdown-it-prism`](https://github.com/jGleitz/markdown-it-prism) - [Prism](https://prismjs.com/) for syntax highlighting
-  - [`prism-theme-vars`](https://github.com/antfu/prism-theme-vars) - customizable Prism.js theme using CSS variables
-- [Vue I18n](https://github.com/intlify/vue-i18n-next) - Internationalization
-  - [`vite-plugin-vue-i18n`](https://github.com/intlify/vite-plugin-vue-i18n) - Vite plugin for Vue I18n
-- [VueUse](https://github.com/antfu/vueuse) - collection of useful composition APIs
-- [`vite-ssg-sitemap`](https://github.com/jbaubree/vite-ssg-sitemap) - Sitemap generator
-- [`@vueuse/head`](https://github.com/vueuse/head) - manipulate document head reactively
+y añadimos esto al final de la configuración de vite.config.ts
 
-### Coding Style
+ coverage: {
+      reporter: ['text', 'cobertura'],
+    },
 
-- Use Composition API with [`<script setup>` SFC syntax](https://github.com/vuejs/rfcs/pull/227)
-- [ESLint](https://eslint.org/) with [@antfu/eslint-config](https://github.com/antfu/eslint-config), single quotes, no semi.
-
-### Dev tools
-
-- [TypeScript](https://www.typescriptlang.org/)
-- [Vitest](https://github.com/vitest-dev/vitest) - Unit testing powered by Vite
-- [Cypress](https://cypress.io/) - E2E testing
-- [pnpm](https://pnpm.js.org/) - fast, disk space efficient package manager
-- [`vite-ssg`](https://github.com/antfu/vite-ssg) - Static-site generation
-  - [critters](https://github.com/GoogleChromeLabs/critters) - Critical CSS
-- [Netlify](https://www.netlify.com/) - zero-config deployment
-- [VS Code Extensions](./.vscode/extensions.json)
-  - [Vite](https://marketplace.visualstudio.com/items?itemName=antfu.vite) - Fire up Vite server automatically
-  - [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) - Vue 3 `<script setup>` IDE support
-  - [Iconify IntelliSense](https://marketplace.visualstudio.com/items?itemName=antfu.iconify) - Icon inline display and autocomplete
-  - [i18n Ally](https://marketplace.visualstudio.com/items?itemName=lokalise.i18n-ally) - All in one i18n support
-  - [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-
-## Variations
-
-As this template is strongly opinionated, the following provides a curated list for community-maintained variations with different preferences and feature sets. Check them out as well. PR to add yours is also welcome!
-
-###### Official
-
-- [vitesse-lite](https://github.com/antfu/vitesse-lite) - Lightweight version of Vitesse
-- [vitesse-nuxt3](https://github.com/antfu/vitesse-nuxt3) - Vitesse for Nuxt 3
-- [vitesse-nuxt-bridge](https://github.com/antfu/vitesse-nuxt-bridge) - Vitesse for Nuxt 2 with Bridge
-- [vitesse-webext](https://github.com/antfu/vitesse-webext) - WebExtension Vite starter template
-
-###### Community
-
-- [vitesse-ssr-template](https://github.com/frandiox/vitesse-ssr-template) by [@frandiox](https://github.com/frandiox) - Vitesse with SSR
-- [vitespa](https://github.com/ctholho/vitespa) by [@ctholho](https://github.com/ctholho) - Like Vitesse but without SSG/SSR
-- [vitailse](https://github.com/zynth17/vitailse) by [@zynth17](https://github.com/zynth17) - Like Vitesse but with TailwindCSS
-- [vitesse-modernized-chrome-ext](https://github.com/xiaoluoboding/vitesse-modernized-chrome-ext) by [@xiaoluoboding](https://github.com/xiaoluoboding) - ⚡️ Modernized Chrome Extension Manifest V3 Vite Starter Template
-- [vitesse-stackter-clean-architect](https://github.com/shamscorner/vitesse-stackter-clean-architect) by [@shamscorner](https://github.com/shamscorner) - A modular clean architecture pattern in vitesse template
-- [vitesse-enterprise](https://github.com/FranciscoKloganB/vitesse-enterprise) by [@FranciscoKloganB](https://github.com/FranciscoKloganB) - Consistent coding styles regardless of team-size.
-- [vitecamp](https://github.com/nekobc1998923/vitecamp) by [@nekobc1998923](https://github.com/nekobc1998923) - Like Vitesse but without SSG/SSR/File based routing, includes Element Plus
-- [vitesse-lite-react](https://github.com/lxy-yz/vitesse-lite-react) by [@lxy-yz](https://github.com/lxy-yz) - vitesse-lite React fork
-
-## Try it now!
-
-> Vitesse requires Node >=14
-
-### GitHub Template
-
-[Create a repo from this template on GitHub](https://github.com/antfu/vitesse/generate).
-
-### Clone to local
-
-If you prefer to do it manually with the cleaner git history
-
-```bash
-npx degit antfu/vitesse my-vitesse-app
-cd my-vitesse-app
-pnpm i # If you don't have pnpm installed, run: npm install -g pnpm
-```
-
-## Checklist
-
-When you use this template, try follow the checklist to update your info properly
-
-- [ ] Change the author name in `LICENSE`
-- [ ] Change the title in `App.vue`
-- [ ] Change the hostname in `vite.config.ts`
-- [ ] Change the favicon in `public`
-- [ ] Remove the `.github` folder which contains the funding info
-- [ ] Clean up the READMEs and remove routes
-
-And, enjoy :)
-
-## Usage
-
-### Development
-
-Just run and visit http://localhost:3333
-
-```bash
-pnpm dev
-```
-
-### Build
-
-To build the App, run
-
-```bash
-pnpm build
-```
-
-And you will see the generated file in `dist` that ready to be served.
-
-### Deploy on Netlify
-
-Go to [Netlify](https://app.netlify.com/start) and select your clone, `OK` along the way, and your App will be live in a minute.
-
-## Why
-
-I have created several Vite apps recently. Setting the configs up is kinda the bottleneck for me to make the ideas simply come true within a very short time.
-
-So I made this starter template for myself to create apps more easily, along with some good practices that I have learned from making those apps. It's strongly opinionated, but feel free to tweak it or even maintains your own forks. [(see community maintained variation forks)](#variations)
+para hacer los test automatizados de integración continua y que ademas cree el informe de cobertura 
+
+
+
+Configuramos eslint para ignore patterns cypress segun indica en el index.js comentados
+
+
+
+Configuracion del Gitlab CI
+
+creamos el archivo en el ./ del proyecto llamado .gitlab-ci.yml
+
+stages:    
+  - prepare      
+  - test
+  - build
+
+variables:
+   CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"  
+
+default:
+   image: cypress/base:16.13.0
+   cache: &cache
+     key: "$CI_COMMIT_REF_SLUG"
+     paths:
+       - node_modules/
+       - cache/Cypress
+     policy: pull
+
+prepare:
+  stage: prepare
+  interruptible: true
+  cache:
+    <<: *cache
+    policy: push
+  script:
+    - npm ci
+  
+build-site:
+  stage: build
+  cache:
+    <<: *cache
+    policy: pull
+  script:
+    - CI=true npm run build 
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - dist
+
+unit-test-coverage: 
+  stage: test   
+  cache:
+    <<: *cache
+    policy: pull 
+  script:
+    - CI=true npm run test:and:coverage
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+
+test:lint:
+  stage: test 
+  cache:
+    <<: *cache
+    policy: pull 
+  interruptible: true
+  script:
+    - CI=true npm run lint
+
+cypress-e2e:
+  stage: test
+  cache:
+    <<: *cache
+    policy: pull 
+  script:
+    - $(npm bin)/cypress cache path
+    - $(npm bin)/cypress cache list
+    - $(npm bin)/cypress verify
+    - CI=true npm run dev:silent &
+    - $(npm bin)/cypress run
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+    - cypress/screenshots
+    - cypress/videos
+
+cypress-e2e-chrome:
+   image: cypress/browsers:node14.17.6-slim-chrome100-ff99-edge
+   stage: test
+   script:
+     - CI=true npm run dev:silent &
+     - $(npm bin)/cypress run --browser chrome
+   artifacts:
+     expire_in: 1 week
+     when: always
+     paths:
+     - cypress/screenshots
+     - cypress/videos
+
+
+
+añadir al archivo .eslintignore
+
+dist
+public
+cypress/plugins/index.js  
+cache/*
+cypress/support/index.js
+
+y en .eslintrc
+
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+  },
+  "globals": {
+    "i4t": true,
+    "pdfjsLib": true,
+    "module": true
+  }
+}
+
+
+
+incorporación de los componentes de chakra
+
+pnpm i @chakra-ui/vue-next
+
+pnpm i -D @babel/core
+
+create file on modules chakra.ts  
+
+import ChakraUIVuePlugin, { chakra } from "@chakra-ui/vue-next";
+import { domElements } from "@chakra-ui/vue-system";
+import { type UserModule } from '~/types'
+
+
+export const install: UserModule = ({ app, router, isClient }) => {
+    app.use(ChakraUIVuePlugin)
+  
+  
+  domElements.forEach((tag) => {
+    app.component(`chakra.${tag}`, chakra(tag));
+  });
+}
+
+añadir un script en el package.jon para hacer el build sin SSG 
+
+"build:noSSG": "vite build"
+
+https://vue.chakra-ui.com/getting-started 
+
+https://next.vue.chakra-ui.com/ 
+
+
+
+configurar los mensajes de gitlab
+
+seguir las pautas del link para configurar los mensajes cada usuario 
+
+https://docs.gitlab.com/ee/user/profile/notifications.html 
+
+https://gitlab.com/-/profile/notifications
+
+usar custom notifications activar las de pipeline
