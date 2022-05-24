@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CFlex, CBox, CBadge, CIcon, CText } from "@chakra-ui/vue-next";
+import { CFlex, CBox, CBadge, CIcon, CText , CAlert , CAlertDescription , CAlertIcon , CAlertTitle } from "@chakra-ui/vue-next";
 const user = useUserStore()
 const favorites = useFavoritesPiniaStore()
 const name = $ref(user.savedName)
@@ -16,6 +16,19 @@ const { t } = useI18n()
 <div v-if="favorites.getSize>=0"> Pinia standard sintax works </div>
 <div v-else> PINIA STANDARD SINTAX ITS NOT WORKING </div>
 <div v-if="CBox">
+<CAlert>
+  <CAlertIcon>  
+  </CAlertIcon>
+  <CAlertTitle>
+    titulo fuera del text
+    <CText>
+         titulo de la alerta
+        </CText>
+  </CAlertTitle>
+<CAlertDescription>
+descripcion
+</CAlertDescription>
+</CAlert>
 <CBox
     w="300px"
     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';"
