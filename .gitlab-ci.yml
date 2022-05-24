@@ -1,0 +1,90 @@
+stages:    
+  - prepare      
+  - test
+  - build
+
+variables:
+   CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"  
+
+default:
+   image: cypress/base:16.13.0
+   cache: &cache
+     key: "$CI_COMMIT_REF_SLUG"
+     paths:
+       - node_modules/
+       - cache/Cypress
+     policy: pull
+
+prepare:
+  stage: prepare
+  interruptible: true
+  cache:
+    <<: *cache
+    policy: push
+  script:
+    - npm ci
+  
+build-site:
+  stage: build
+  cache:
+    <<: *cache
+    policy: pull
+  script:
+    - CI=true npm run build 
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - dist
+
+unit-test-coverage: 
+  stage: test   
+  cache:
+    <<: *cache
+    policy: pull 
+  script:
+    - CI=true npm run test:and:coverage
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+
+test:lint:
+  stage: test 
+  cache:
+    <<: *cache
+    policy: pull 
+  interruptible: true
+  script:
+    - CI=true npm run lint
+
+cypress-e2e:
+  stage: test
+  cache:
+    <<: *cache
+    policy: pull 
+  script:
+    - $(npm bin)/cypress cache path
+    - $(npm bin)/cypress cache list
+    - $(npm bin)/cypress verify
+    - CI=true npm run dev:silent &
+    - $(npm bin)/cypress run
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+    - cypress/screenshots
+    - cypress/videos
+
+cypress-e2e-chrome:
+   image: cypress/browsers:node14.17.6-slim-chrome100-ff99-edge
+   stage: test
+   script:
+     - CI=true npm run dev:silent &
+     - $(npm bin)/cypress run --browser chrome
+   artifacts:
+     expire_in: 1 week
+     when: always
+     paths:
+     - cypress/screenshots
+     - cypress/videos

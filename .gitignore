@@ -3,7 +3,11 @@
 .vite-ssg-temp
 *.local
 dist
+public
 dist-ssr
 node_modules
 .idea/
 *.log
+cypress/plugins/index.js  
+cypress/support/index.js
+cache/*

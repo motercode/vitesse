@@ -9,12 +9,18 @@
     "preview-https": "serve dist",
     "test": "vitest",
     "test:e2e": "cypress open",
-    "test:unit": "vitest",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck": "vue-tsc --noEmit",
+    "dev:silent": "vite --port 3333",
+    "test:e2e:silent": "cypress run",
+    "test:and:coverage": "vitest run --coverage",
+    "test:unit": "vitest --run",
+    "build:noSSG": "vite build"
   },
   "dependencies": {
+    "@chakra-ui/vue-next": "1.0.0-alpha.15",
     "@vueuse/core": "^8.5.0",
     "@vueuse/head": "^0.7.6",
+    "c8": "^7.11.3",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.14",
     "prism-theme-vars": "^0.2.3",
@@ -25,6 +31,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.23.1",
+    "@babel/core": "^7.18.0",
     "@iconify-json/carbon": "^1.1.5",
     "@intlify/vite-plugin-vue-i18n": "^4.0.0",
     "@types/markdown-it-link-attributes": "^3.0.1",

@@ -1,3 +1,17 @@
 {
-  "extends": "@antfu"
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+  },
+  "globals": {
+    "i4t": true,
+    "pdfjsLib": true,
+    "module": true
+  }
 }

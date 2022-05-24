@@ -7,7 +7,6 @@ const go = () => {
   if (name)
     router.push(`/hi/${encodeURIComponent(name)}`)
 }
-
 const { t } = useI18n()
 </script>
 
